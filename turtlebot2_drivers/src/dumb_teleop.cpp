@@ -26,7 +26,7 @@ int main(int argc, char * argv[])
   auto node = rclcpp::Node::make_shared("dumb_teleop");
 
   auto cmd_vel_pub = node->create_publisher<geometry_msgs::msg::Twist>(
-    "cmd_vel", rmw_qos_profile_default);
+    "cmd_vel", rclcpp::QoS(10));
 
   rclcpp::WallRate loop_rate(20);
   int count = 0;
@@ -38,7 +38,7 @@ int main(int argc, char * argv[])
 
   while (rclcpp::ok()) {
     std::cout << "Publishing: (" << msg->linear.x << ", " << msg->angular.z << ")" << std::endl;
-    cmd_vel_pub->publish(msg);
+    cmd_vel_pub->publish(*msg);
     if (++count >= switch_count) {
       msg->angular.z *= -1.0;
       count = 0;
