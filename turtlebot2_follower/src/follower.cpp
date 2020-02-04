@@ -127,10 +127,10 @@ private:
     cmd_vel_qos_profile.depth = 50;
     cmd_vel_qos_profile.reliability = RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT;
     cmd_vel_qos_profile.durability = RMW_QOS_POLICY_DURABILITY_VOLATILE;
-    cmdpub_ = n_->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", cmd_vel_qos_profile);
+    cmdpub_ = n_->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", rclcpp::QoS(10));
     //markerpub_ = private_nh.advertise<visualization_msgs::Marker>("marker",1);
     //bboxpub_ = private_nh.advertise<visualization_msgs::Marker>("bbox",1);
-    sub_= n_->create_subscription<sensor_msgs::msg::Image>("depth", std::bind(&TurtlebotFollower::imagecb, this, std::placeholders::_1), rmw_qos_profile_sensor_data);
+    sub_= n_->create_subscription<sensor_msgs::msg::Image>("depth",rclcpp::QoS(10), std::bind(&TurtlebotFollower::imagecb, this, std::placeholders::_1));
 
     //switch_srv_ = private_nh.advertiseService("change_state", &TurtlebotFollower::changeModeSrvCb, this);
 
@@ -237,7 +237,7 @@ private:
         ROS_INFO_THROTTLE(1, "Centroid too far away %f, stopping the robot", z);
         if (enabled_)
         {
-          cmdpub_->publish(cmd_vel_msg);
+          cmdpub_->publish(*cmd_vel_msg);
         }
         return;
       }
@@ -249,7 +249,7 @@ private:
       {
         cmd_vel_msg->linear.x = (z - goal_z_) * z_scale_;
         cmd_vel_msg->angular.z = -x * x_scale_;
-        cmdpub_->publish(cmd_vel_msg);
+        cmdpub_->publish(*cmd_vel_msg);
       }
     }
     else
@@ -259,7 +259,7 @@ private:
 
       if (enabled_)
       {
-        cmdpub_->publish(cmd_vel_msg);
+        cmdpub_->publish(*cmd_vel_msg);
       }
     }
 
