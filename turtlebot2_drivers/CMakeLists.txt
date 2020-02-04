@@ -20,6 +20,8 @@ find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
+find_package(Eigen3 REQUIRED)
+
 
 add_executable(kobuki_node src/kobuki_node.cpp)
 ament_target_dependencies(kobuki_node
@@ -32,6 +34,8 @@ ament_target_dependencies(kobuki_node
 # Note that this setting must come after the call to
 # ament_target_dependencies() to avoid including a ROS1 tf2 installation that
 # might be on the system.
+
+include_directories(/usr/include/eigen3/)
 target_include_directories(kobuki_node PRIVATE ${kobuki_driver_INCLUDE_DIRS})
 target_link_libraries(kobuki_node ${kobuki_driver_LIBRARIES})
 
