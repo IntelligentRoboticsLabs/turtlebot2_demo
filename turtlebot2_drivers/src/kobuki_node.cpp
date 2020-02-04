@@ -84,9 +84,9 @@ int main(int argc, char * argv[])
   auto node = rclcpp::Node::make_shared("kobuki_node");
   g_logger = node->get_logger();
   auto cmd_vel_sub = node->create_subscription<geometry_msgs::msg::Twist>(
-    "cmd_vel", cmdVelCallback, cmd_vel_qos_profile);
-  auto odom_pub = node->create_publisher<nav_msgs::msg::Odometry>("odom", odom_and_imu_qos_profile);
-  auto imu_pub = node->create_publisher<sensor_msgs::msg::Imu>("imu", odom_and_imu_qos_profile);
+    "cmd_vel", rclcpp::QoS(10), cmdVelCallback);
+  auto odom_pub = node->create_publisher<nav_msgs::msg::Odometry>("odom", rclcpp::QoS(10));
+  auto imu_pub = node->create_publisher<sensor_msgs::msg::Imu>("imu", rclcpp::QoS(10));
   tf2_ros::TransformBroadcaster br(node);
 
   kobuki::Parameters parameters;
@@ -192,7 +192,7 @@ int main(int argc, char * argv[])
     odom_msg->twist.twist.angular.y = 0.0;
     odom_msg->twist.twist.angular.z = pose_update_rates[2];
 
-    odom_pub->publish(odom_msg);
+    odom_pub->publish(*odom_msg);
 
     // Stuff and publish /imu_data
     imu_msg->header.stamp = odom_msg->header.stamp;
@@ -226,7 +226,7 @@ int main(int argc, char * argv[])
     imu_msg->linear_acceleration.y = 0.0;
     imu_msg->linear_acceleration.z = 9.8;
 
-    imu_pub->publish(imu_msg);
+    imu_pub->publish(*imu_msg);
 
     // Stuff and publish /tf
     odom_tf_msg->header.stamp = odom_msg->header.stamp;
